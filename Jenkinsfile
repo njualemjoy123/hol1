@@ -14,15 +14,20 @@ pipeline {
                 sh 'mvn package'
             }
         }
-         stage('deploy') {
+         stage('test') {
             steps {
-                echo 'Hello deploy'
+                sh 'mvn test'
                 
             }
         }
-         stage('test') {
+         stage('build and publish image') {
             steps {
-                echo 'Hello test'
+                script {
+                    checkout scm
+                    docker.withRegistry('', 'DockerRegistryID') {
+                        def customImage = docker.build("amstrongnju/hol1-pipeline:${env.BUILD_ID}")
+                    }
+                }
                 
             }
         }
